@@ -81,7 +81,27 @@ jobs:
         run: echo "CurrentTime=${{steps.current-time.outputs.formattedTime}}"
         shell: bash
 
-      - name: Copy JAR file
+#      - name: Copy JAR file
+#        run: |
+#          mkdir -p deploy
+#          cp build/libs/TUNA-STUDY-CICD-0.0.1-SNAPSHOT.jar deploy/application.jar
+
+      - name: Generate deployment package
         run: |
           mkdir -p deploy
           cp build/libs/TUNA-STUDY-CICD-0.0.1-SNAPSHOT.jar deploy/application.jar
+          cp Procfile deploy/Procfile
+          cp -r .ebextensions deploy/.ebextensions
+          cp -r .platform deploy/.platform
+          cd deploy && zip -r deploy.zip .
+#
+#      - name: Beanstalk Deploy
+#        uses: einaregilsson/beanstalk-deploy@v22
+#        with:
+#          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          application_name: erpc-back-ver2
+#          environment_name: Erpc-back-ver2-env-1
+#          version_label: github-action-${{steps.current-time.outputs.formattedTime}}
+#          region: ap-northeast-2
+#          deployment_package: deploy/deploy.zip

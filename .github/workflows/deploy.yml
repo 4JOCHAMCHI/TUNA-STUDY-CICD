@@ -50,7 +50,7 @@ jobs:
                   use_sql_comments: true
           EOL
 
-      - name: Set Yaml
+      - name: Set Yml
         run: |
           envsubst < src/main/resources/application.yml.template > src/main/resources/application.yml
           echo "Generated application.yml:"
@@ -84,4 +84,4 @@ jobs:
       - name: Copy JAR file
         run: |
           mkdir -p deploy
-          cp build/libs/TUNA-STUDY-CICD-0.0.2-SNAPSHOT.jar deploy/application.jar
+          cp build/libs/TUNA-STUDY-CICD-0.0.1-SNAPSHOT.jar deploy/application.jar

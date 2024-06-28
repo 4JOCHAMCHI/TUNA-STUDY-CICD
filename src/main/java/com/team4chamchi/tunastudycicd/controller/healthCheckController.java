@@ -8,6 +8,6 @@ public class healthCheckController {
 
     @GetMapping("/health")
     public String healthCheck() {
-        return "yammi";
+        return "new branch push";
     }
 }

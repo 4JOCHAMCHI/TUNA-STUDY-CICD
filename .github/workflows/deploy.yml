@@ -50,7 +50,7 @@ jobs:
                   use_sql_comments: true
           EOL
 
-      - name: Set Yaml
+      - name: Set Yml
         run: |
           envsubst < src/main/resources/application.yml.template > src/main/resources/application.yml
           echo "Generated application.yml:"

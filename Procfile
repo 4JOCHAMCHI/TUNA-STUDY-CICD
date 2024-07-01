@@ -1,1 +1,1 @@
-web: java -jar application.jar
+web: /sbin/appstart

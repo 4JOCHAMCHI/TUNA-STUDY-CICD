@@ -35,7 +35,7 @@ jobs:
           mkdir -p src/main/resources
           cat > src/main/resources/application.yml.template <<EOL
           server:
-            port: 5000
+            port: 8081
             tomcat:
               uri-encoding: UTF-8
 

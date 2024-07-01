@@ -1,4 +1,4 @@
-name: tuna-study-cicd
+name: PIOMSBE
 
 permissions:
   contents: read
@@ -27,34 +27,51 @@ jobs:
         run: chmod +x ./gradlew
         shell: bash
 
+      - name: Install envsubst
+        run: sudo apt-get install -y gettext
+
       - name: Create application.yml.template
         run: |
           mkdir -p src/main/resources
           cat > src/main/resources/application.yml.template <<EOL
           server:
             port: 5000
-          
+            tomcat:
+              uri-encoding: UTF-8
+
           spring:
-            datasource:
-              driver-class-name: org.mariadb.jdbc.Driver
-              url: jdbc:mariadb://\${RDS_HOSTNAME}:\${RDS_PORT}/\${RDS_DB_NAME}
-              username: \${RDS_USERNAME}
-              password: \${RDS_PASSWORD}
+            application:
+              name: bean-tuna
+            main:
+              allow-bean-definition-overriding: true
+            cloud:
+              aws:
+                s3:
+                  bucket: \${SPRING_CLOUD_AWS_S3_BUCKET}
+                  region: \${SPRING_CLOUD_AWS_S3_REGION}
+                  access-key: \${AWS_ACCESS_KEY_ID}
+                  secret-key: \${AWS_SECRET_ACCESS_KEY}
             jpa:
-              hibernate:
-                ddl-auto: update
-              show-sql: true
+              show-sql: false
+              database: mysql
               properties:
                 hibernate:
-                  dialect: org.hibernate.dialect.MariaDBDialect
-                  format_sql: true
-                  use_sql_comments: true
+                  jdbc:
+                    time_zone: Asia/Seoul
+              database-platform: org.hibernate.dialect.MySQL8Dialect
+              generate-ddl: false
+              default_batch_fetch_size: 1000
+
+            datasource:
+              driver-class-name: org.mariadb.jdbc.Driver
+              url: jdbc:mariadb://\${RDS_HOSTNAME}:\${RDS_PORT}/\${RDS_DB_NAME}?serverTimezone=Asia/Seoul
+              username: \${RDS_USERNAME}
+              password: \${RDS_PASSWORD}
           EOL
 
-      - name: Set Yml
+      - name: Set Yaml
         run: |
           envsubst < src/main/resources/application.yml.template > src/main/resources/application.yml
-          echo "Generated application.yml:"
           cat src/main/resources/application.yml
         env:
           RDS_HOSTNAME: ${{ secrets.RDS_HOSTNAME }}
@@ -64,13 +81,12 @@ jobs:
           RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
           SPRING_CLOUD_AWS_S3_BUCKET: ${{ secrets.SPRING_CLOUD_AWS_S3_BUCKET }}
           SPRING_CLOUD_AWS_S3_REGION: ${{ secrets.SPRING_CLOUD_AWS_S3_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
 
       - name: Build with Gradle
-        run: ./gradlew clean build -x test
-        shell: bash
-
-      - name: List build/libs directory
-        run: ls -la build/libs
+        run: ./gradlew clean build
         shell: bash
 
       - name: Get current time
@@ -87,19 +103,64 @@ jobs:
       - name: Generate deployment package
         run: |
           mkdir -p deploy
-          cp build/libs/TUNA-STUDY-CICD-0.0.1-SNAPSHOT.jar deploy/application.jar
-          cp Procfile deploy/Procfile
-          cp -r .ebextensions deploy/.ebextensions
-          cp -r .platform deploy/.platform
+          JAR_FILE=$(ls build/libs/*.jar | head -n 1)
+          if [ -f "$JAR_FILE" ]; then
+            cp "$JAR_FILE" deploy/application.jar
+          else
+            echo "JAR file not found!"
+            exit 1
+          fi
+          
+          if [ -f Procfile ]; then
+            cp Procfile deploy/Procfile
+          else
+            echo "Procfile not found!"
+            exit 1
+          fi
+          
+          if [ -d .ebextensions ]; then
+            cp -r .ebextensions deploy/.ebextensions
+          else
+            echo ".ebextensions directory not found!"
+            exit 1
+          fi
+          
+          if [ -d .platform ]; then
+            cp -r .platform deploy/.platform
+          else
+            echo ".platform directory not found!"
+            exit 1
+          fi
+          
           cd deploy && zip -r deploy.zip .
+        shell: bash
 
-      - name: Beanstalk Deploy
-        uses: einaregilsson/beanstalk-deploy@v22
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: bean-tuna
-          environment_name: Bean-tuna-env
-          version_label: action-${{steps.current-time.outputs.formattedTime}}
-          region: ap-northeast-2
-          deployment_package: deploy/deploy.zip
+      - name: Upload application version to S3
+        run: |
+          aws s3 cp deploy/deploy.zip s3://elasticbeanstalk-ap-northeast-2-033089156253/deploy/deploy.zip
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ap-northeast-2
+
+      - name: Create new Elastic Beanstalk application version
+        run: |
+          aws elasticbeanstalk create-application-version \
+            --application-name PIOMSBE \
+            --version-label github-action-${{steps.current-time.outputs.formattedTime}} \
+            --source-bundle S3Bucket=elasticbeanstalk-ap-northeast-2-033089156253,S3Key=deploy/deploy.zip
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ap-northeast-2
+
+      - name: Update Elastic Beanstalk environment
+        run: |
+          aws elasticbeanstalk update-environment \
+            --environment-name PIOMSBE-env \
+            --version-label github-action-${{steps.current-time.outputs.formattedTime}}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ap-northeast-2
+

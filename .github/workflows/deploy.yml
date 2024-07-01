@@ -146,7 +146,7 @@ jobs:
       - name: Create new Elastic Beanstalk application version
         run: |
           aws elasticbeanstalk create-application-version \
-            --application-name PIOMSBE \
+            --application-name bean-tuna \
             --version-label github-action-${{steps.current-time.outputs.formattedTime}} \
             --source-bundle S3Bucket=elasticbeanstalk-ap-northeast-2-033089156253,S3Key=deploy/deploy.zip
         env:

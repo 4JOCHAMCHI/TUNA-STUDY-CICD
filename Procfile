@@ -1,1 +1,1 @@
-web: java -jar your-application.jar
+web: java -jar /var/app/current/application.jar

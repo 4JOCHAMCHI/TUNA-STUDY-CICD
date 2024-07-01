@@ -1,4 +1,4 @@
-name: PIOMSBE
+name: tunastudyCICD
 
 permissions:
   contents: read
@@ -157,7 +157,7 @@ jobs:
       - name: Update Elastic Beanstalk environment
         run: |
           aws elasticbeanstalk update-environment \
-            --environment-name PIOMSBE-env \
+            --environment-name Bean-tuna-env \
             --version-label github-action-${{steps.current-time.outputs.formattedTime}}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

@@ -32,7 +32,7 @@ jobs:
           mkdir -p src/main/resources
           cat > src/main/resources/application.yml.template <<EOL
           server:
-            port: 8081
+            port: 5000
           
           spring:
             datasource:
@@ -93,6 +93,13 @@ jobs:
           cp -r .platform deploy/.platform
           cd deploy && zip -r deploy.zip .
 
+      - name: Upload to S3
+        run: |
+          aws s3 cp deploy/deploy.zip s3://${{ secrets.SPRING_CLOUD_AWS_S3_BUCKET }}/deploy/deploy.zip --region ${{ secrets.SPRING_CLOUD_AWS_S3_REGION }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
       - name: Beanstalk Deploy
         uses: einaregilsson/beanstalk-deploy@v22
         with:
@@ -102,4 +109,4 @@ jobs:
           environment_name: Bean-tuna-env
           version_label: github-action-${{steps.current-time.outputs.formattedTime}}
           region: ap-northeast-2
-          deployment_package: deploy/deploy.zip
+          deployment_package: s3://${{ secrets.SPRING_CLOUD_AWS_S3_BUCKET }}/deploy/deploy.zip

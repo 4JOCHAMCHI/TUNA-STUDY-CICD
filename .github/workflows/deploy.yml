@@ -102,4 +102,4 @@ jobs:
           environment_name: Bean-tuna-env
           version_label: github-action-${{steps.current-time.outputs.formattedTime}}
           region: ap-northeast-2
-          deployment_package: s3://${{ secrets.SPRING_CLOUD_AWS_S3_BUCKET }}/deploy/deploy.zip
+          deployment_package: deploy/deploy.zip

@@ -1,6 +1,6 @@
 package com.team4chamchi.tunastudycicd.studyroom.dto;
 
-import com.team4chamchi.tunastudycicd.studyroom.aggregate.StudyRoom;
+import com.team4chamchi.tunastudycicd.studyroom.aggregate.Studyroom;
 import lombok.*;
 
 @NoArgsConstructor
@@ -8,11 +8,12 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
-public class StudyRoomDTO {
+@Data
+public class StudyroomDTO {
     private int roomId;
     private String roomName;
 
-    public StudyRoomDTO(StudyRoom studyRoom) {
+    public StudyroomDTO(Studyroom studyRoom) {
         this.roomId = studyRoom.getRoomId();
         this.roomName = studyRoom.getRoomName();
     }

@@ -5,7 +5,7 @@ import com.team4chamchi.tunastudycicd.member.dto.MemberDTO;
 import com.team4chamchi.tunastudycicd.reservation.aggregate.Reservation;
 import com.team4chamchi.tunastudycicd.reservation.dto.ReservationDTO;
 import com.team4chamchi.tunastudycicd.reservation.service.ReservationService;
-import com.team4chamchi.tunastudycicd.studyroom.dto.StudyRoomDTO;
+import com.team4chamchi.tunastudycicd.studyroom.dto.StudyroomDTO;
 import com.team4chamchi.tunastudycicd.studyroom.service.StudyRoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,8 +28,8 @@ public class ReservationController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<StudyRoomDTO>> findAllSeat() {
-        List<StudyRoomDTO> allSeatList = studyRoomService.findALlSeat();
+    public ResponseEntity<List<StudyroomDTO>> findAllSeat() {
+        List<StudyroomDTO> allSeatList = studyRoomService.findALlSeat();
 
         return ResponseEntity.ok(allSeatList);
     }

@@ -1,6 +1,6 @@
 package com.team4chamchi.tunastudycicd.studyroom.service;
 
-import com.team4chamchi.tunastudycicd.studyroom.dto.StudyRoomDTO;
+import com.team4chamchi.tunastudycicd.studyroom.dto.StudyroomDTO;
 import com.team4chamchi.tunastudycicd.studyroom.respository.StudyRoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,8 +17,8 @@ public class StudyRoomService {
         this.studyRoomRepository = studyRoomRepository;
     }
 
-    public List<StudyRoomDTO> findALlSeat() {
+    public List<StudyroomDTO> findALlSeat() {
         return studyRoomRepository.findAll().stream()
-                .map(StudyRoomDTO::new).toList();
+                .map(StudyroomDTO::new).toList();
     }
 }

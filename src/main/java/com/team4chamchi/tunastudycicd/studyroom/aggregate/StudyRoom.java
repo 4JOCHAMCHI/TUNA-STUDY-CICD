@@ -14,6 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
+@Data
 public class StudyRoom {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

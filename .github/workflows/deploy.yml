@@ -77,7 +77,7 @@ jobs:
                 access-key: \${AWS_ACCESS_KEY_ID}
                 secret-key: \${AWS_SECRET_ACCESS_KEY}
               region:
-                static: ap-northeast-1
+                static: ap-northeast-2
                 auto: false
 
               s3:
@@ -85,6 +85,9 @@ jobs:
                 region: \${SPRING_CLOUD_AWS_S3_REGION}
                 access-key: \${AWS_ACCESS_KEY_ID}
                 secret-key: \${AWS_SECRET_ACCESS_KEY}
+
+              sns:
+                region: ap-northeast-1
           EOL
 
       - name: Set Yaml

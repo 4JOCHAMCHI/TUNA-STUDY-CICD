@@ -12,9 +12,6 @@ import java.util.List;
 @Table(name = "member")
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
-@ToString
 @Data
 public class Member {
     @Id

@@ -12,9 +12,6 @@ import java.time.LocalDateTime;
 @Table(name = "reservation")
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
-@ToString
 @Data
 public class Reservation {
     @Id

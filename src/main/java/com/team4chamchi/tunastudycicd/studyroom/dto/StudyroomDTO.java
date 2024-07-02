@@ -8,7 +8,6 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
-@Data
 public class StudyRoomDTO {
     private int roomId;
     private String roomName;

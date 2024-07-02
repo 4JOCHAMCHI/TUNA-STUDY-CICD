@@ -8,7 +8,6 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
-@Data
 public class MemberDTO {
     private int memberId;
     private String memberPhone;

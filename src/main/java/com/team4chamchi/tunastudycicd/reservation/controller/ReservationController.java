@@ -22,8 +22,7 @@ public class ReservationController {
     private final StudyRoomService studyRoomService;
 
     @Autowired
-    public ReservationController(ReservationService reservationService,
-                                 StudyRoomService studyRoomService) {
+    public ReservationController(ReservationService reservationService, StudyRoomService studyRoomService) {
         this.reservationService = reservationService;
         this.studyRoomService = studyRoomService;
     }
@@ -46,8 +45,7 @@ public class ReservationController {
     public ResponseEntity<MemberDTO> findMemberByPhone(@PathVariable("phone") String phone) {
         Optional<Member> member = reservationService.findMemberByPhone(phone);
 
-        return member.map(value -> ResponseEntity.ok(new MemberDTO(value))).orElseGet(()
-                -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+        return member.map(value -> ResponseEntity.ok(new MemberDTO(value))).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
     @PostMapping("/member")
@@ -61,13 +59,11 @@ public class ReservationController {
     public ResponseEntity<ReservationDTO> findReservationByPhone(@PathVariable("phone") String phone) {
         Optional<Reservation> reservation = reservationService.findReservationByPhone(phone);
 
-        return reservation.map(value -> ResponseEntity.ok(new ReservationDTO(value))).orElseGet(()
-                -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+        return reservation.map(value -> ResponseEntity.ok(new ReservationDTO(value))).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
     @GetMapping("/reservation/{phone}/{roomId}")
-    public ResponseEntity<ReservationDTO> findReservation(@PathVariable("phone") String phone,
-                                                          @PathVariable("roomId") int roomId) {
+    public ResponseEntity<ReservationDTO> findReservation(@PathVariable("phone") String phone, @PathVariable("roomId") int roomId) {
         ReservationDTO reservation = reservationService.findReservationByPhoneAndSeat(phone, roomId);
 
         return ResponseEntity.ok(reservation);

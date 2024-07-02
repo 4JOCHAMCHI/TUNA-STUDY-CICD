@@ -2,7 +2,10 @@ package com.team4chamchi.tunastudycicd.reservation.dto;
 
 import com.team4chamchi.tunastudycicd.reservation.aggregate.Reservation;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -10,7 +13,6 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 public class ReservationDTO {
 
     private int reservationId;

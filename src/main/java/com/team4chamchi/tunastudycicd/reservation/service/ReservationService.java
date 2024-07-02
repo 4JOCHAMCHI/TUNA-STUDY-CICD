@@ -7,8 +7,8 @@ import com.team4chamchi.tunastudycicd.notification.service.NotificationService;
 import com.team4chamchi.tunastudycicd.reservation.aggregate.Reservation;
 import com.team4chamchi.tunastudycicd.reservation.dto.ReservationDTO;
 import com.team4chamchi.tunastudycicd.reservation.repository.ReservationRepository;
-import com.team4chamchi.tunastudycicd.studyroom.aggregate.StudyRoom;
-import com.team4chamchi.tunastudycicd.studyroom.respository.StudyRoomRepository;
+import com.team4chamchi.tunastudy.studyroom.aggregate.StudyRoom;
+import com.team4chamchi.tunastudy.studyroom.respository.StudyRoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -65,15 +65,12 @@ public class ReservationService {
 
     @Transactional
     public ReservationDTO findReservationByPhoneAndSeat(String memberPhone, int roomId) {
-        Member member = findMemberByPhone(memberPhone).orElseThrow(()
-                -> new RuntimeException("존재하지 않는 회원입니다."));
+        Member member = findMemberByPhone(memberPhone).orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
 
-        StudyRoom room = studyRoomRepository.findById(roomId).orElseThrow(()
-                -> new RuntimeException("유효하지 않은 좌석입니다."));
+        StudyRoom room = studyRoomRepository.findById(roomId).orElseThrow(() -> new RuntimeException("유효하지 않은 좌석입니다."));
 
         //전화번호랑 좌석으로 예약 조회
-        Optional<Reservation> reservation
-                = reservationRepository.findByMember_MemberPhoneAndRoom_RoomId(memberPhone, roomId);
+        Optional<Reservation> reservation = reservationRepository.findByMember_MemberPhoneAndRoom_RoomId(memberPhone, roomId);
 
         //조회된 예약이 없는 경우 -> 예약
         if (reservation.isEmpty()) {
@@ -95,8 +92,7 @@ public class ReservationService {
 
             foundReservation.setOccupied(true);
             foundReservation.setStartDate(LocalDateTime.now().withSecond(0).withNano(0));
-            foundReservation.setEndDate
-                    (foundReservation.getStartDate().plusHours(2).withSecond(0).withNano(0));
+            foundReservation.setEndDate(foundReservation.getStartDate().plusHours(2).withSecond(0).withNano(0));
 
             String phone = "+82" + foundReservation.getMember().getMemberPhone();
             String roomName = foundReservation.getRoom().getRoomName();
@@ -139,8 +135,7 @@ public class ReservationService {
         System.out.println("실행");
 
         for (Reservation reservation : reservationList) {
-            notificationService.sendMessage("+82" + reservation.getMember().getMemberPhone(),
-                    reservation.getRoom().getRoomName()+ "번 좌석 퇴실 10분 전입니다.");
+            notificationService.sendMessage("+82" + reservation.getMember().getMemberPhone(), reservation.getRoom().getRoomName()+ "번 좌석 퇴실 10분 전입니다.");
 //            System.out.println(reservation.getMember().getMemberPhone() + " " + reservation.getRoom().getRoomName());
         }
     }

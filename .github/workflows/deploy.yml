@@ -1,4 +1,4 @@
-name: tunastudyCICD
+name: tuna-study-backend
 
 permissions:
   contents: read
@@ -67,6 +67,30 @@ jobs:
               url: jdbc:mariadb://\${RDS_HOSTNAME}:\${RDS_PORT}/\${RDS_DB_NAME}?serverTimezone=Asia/Seoul
               username: \${RDS_USERNAME}
               password: \${RDS_PASSWORD}
+            jpa:
+              hibernate:
+                ddl-auto: update
+              show-sql: true
+              properties:
+                hibernate:
+                  dialect: org.hibernate.dialect.MariaDBDialect
+                  format_sql: true
+                  use_sql_comments: true
+              generate-ddl: on
+            batch:
+              job:
+                enabled: false
+              jdbc:
+                initialize-schema: always
+                schema: classpath:org/springframework/batch/core/schema-mariadb.sql
+          cloud:
+            aws:
+              credentials:
+                access-key: \${AWS_ACCESS_KEY_ID}
+                secret-key: \${AWS_SECRET_ACCESS_KEY}
+              region:
+                static: ap-northeast-1
+                auto: false
           EOL
 
       - name: Set Yaml
@@ -83,7 +107,6 @@ jobs:
           SPRING_CLOUD_AWS_S3_REGION: ${{ secrets.SPRING_CLOUD_AWS_S3_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
 
       - name: Build with Gradle
         run: ./gradlew clean build
@@ -163,4 +186,3 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ap-northeast-2
-

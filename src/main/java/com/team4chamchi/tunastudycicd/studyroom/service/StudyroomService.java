@@ -1,26 +1,25 @@
 package com.team4chamchi.tunastudycicd.studyroom.service;
 
-import com.team4chamchi.tunastudycicd.studyroom.entity.Studyroom;
-import com.team4chamchi.tunastudycicd.studyroom.repository.StudyroomRepository;
-import jakarta.persistence.Column;
+import com.team4chamchi.tunastudycicd.studyroom.dto.StudyRoomDTO;
+import com.team4chamchi.tunastudycicd.studyroom.respository.StudyRoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-public class StudyroomService {
+public class StudyRoomService {
 
-    private final StudyroomRepository studyroomRepository;
+    private final StudyRoomRepository studyRoomRepository;
 
     @Autowired
-    public StudyroomService(StudyroomRepository studyroomRepository) {
-        this.studyroomRepository = studyroomRepository;
+    public StudyRoomService(StudyRoomRepository studyRoomRepository) {
+        this.studyRoomRepository = studyRoomRepository;
     }
 
-    public List<Studyroom> findStudyRoomList() {
-        List<Studyroom> studyroomList = studyroomRepository.findAll();
-
-        return studyroomList;
+    public List<StudyRoomDTO> findALlSeat() {
+        return studyRoomRepository.findAll().stream()
+                .map(StudyRoomDTO::new).toList();
     }
 }

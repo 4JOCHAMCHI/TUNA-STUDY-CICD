@@ -1,9 +1,19 @@
 package com.team4chamchi.tunastudycicd.studyroom.dto;
 
-import lombok.Data;
+import com.team4chamchi.tunastudycicd.studyroom.aggregate.StudyRoom;
+import lombok.*;
 
-@Data
-public class StudyroomDTO {
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString
+public class StudyRoomDTO {
     private int roomId;
     private String roomName;
+
+    public StudyRoomDTO(StudyRoom studyRoom) {
+        this.roomId = studyRoom.getRoomId();
+        this.roomName = studyRoom.getRoomName();
+    }
 }

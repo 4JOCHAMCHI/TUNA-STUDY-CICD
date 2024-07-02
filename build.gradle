@@ -31,6 +31,9 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'org.modelmapper:modelmapper:2.4.4'
+
+    implementation 'software.amazon.awssdk:sns:2.20.12' // AWS SDK for SNS
+    implementation 'software.amazon.awssdk:core:2.20.12' // AWS SDK Core
 }
 
 tasks.named('test') {

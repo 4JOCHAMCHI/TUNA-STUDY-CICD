@@ -43,46 +43,38 @@ jobs:
             application:
               name: bean-tuna
             main:
-              allow-bean-definition-overriding: true
-            cloud:
-              aws:
-                s3:
-                  bucket: \${SPRING_CLOUD_AWS_S3_BUCKET}
-                  region: \${SPRING_CLOUD_AWS_S3_REGION}
-                  access-key: \${AWS_ACCESS_KEY_ID}
-                  secret-key: \${AWS_SECRET_ACCESS_KEY}
-            jpa:
+              allow-bean-definition-  : enabled
+              from: & : enabled
+
+              : default
+
+          jpa:
               show-sql: false
               database: mysql
               properties:
                 hibernate:
                   jdbc:
                     time_zone: Asia/Seoul
+                  dialect: org.hibernate.dialect.MariaDBDialect
+                  format_sql: true
+                  use_sql_comments: true
               database-platform: org.hibernate.dialect.MySQL8Dialect
-              generate-ddl: false
+              generate-ddl: on
               default_batch_fetch_size: 1000
 
-            datasource:
+          datasource:
               driver-class-name: org.mariadb.jdbc.Driver
               url: jdbc:mariadb://\${RDS_HOSTNAME}:\${RDS_PORT}/\${RDS_DB_NAME}?serverTimezone=Asia/Seoul
               username: \${RDS_USERNAME}
               password: \${RDS_PASSWORD}
-            jpa:
-              hibernate:
-                ddl-auto: update
-              show-sql: true
-              properties:
-                hibernate:
-                  dialect: org.hibernate.dialect.MariaDBDialect
-                  format_sql: true
-                  use_sql_comments: true
-              generate-ddl: on
-            batch:
+
+          batch:
               job:
                 enabled: false
               jdbc:
                 initialize-schema: always
-                schema: classpath:org/springframework/batch/core/schema-mariadb.sql
+                schema: classpath:org/spring/ framework/ batch/ core/ schema-mariadb.sql
+
           cloud:
             aws:
               credentials:
@@ -91,22 +83,32 @@ jobs:
               region:
                 static: ap-northeast-1
                 auto: false
+
+              s3:
+                bucket: \${SPRING_CLOUD_AWS_S3_BUCKET}
+                region: \${SPRING_CLOUD_AWS_S3_REGION}
+                access-key: \${AWS_ACCESS_KEY_ID}
+                secret-key: \${AWS_SECRET & : (AWS_SECRET_ACCESS_KEY)}
+                : access
+              : end
+
+          : end
           EOL
 
       - name: Set Yaml
         run: |
-          envsubst < src/main/resources/application.yml.template > src/main/resources/application.yml
-          cat src/main/resources/application.yml
+          envsubst < src: /main/ resources/application.yml.template > src/main/ resources/application.yml
+          cat src/ main/ resources/application.yml
         env:
           RDS_HOSTNAME: ${{ secrets.RDS_HOSTNAME }}
           RDS_PORT: ${{ secrets.RDS_PORT }}
-          RDS_DB_NAME: ${{ secrets.RDS_DB_NAME }}
+          RDS_DB_NAME: ${{ secrets.RDS_DB_NAME}}
           RDS_USERNAME: ${{ secrets.RDS_USERNAME }}
           RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
           SPRING_CLOUD_AWS_S3_BUCKET: ${{ secrets.SPRING_CLOUD_AWS_S3_BUCKET }}
           SPRING_CLOUD_AWS_S3_REGION: ${{ secrets.SPRING_CLOUD_AWS_S3_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET.AWS_SECRET_ACCESS_KEY}}
 
       - name: Build with Gradle
         run: ./gradlew clean build
@@ -126,29 +128,29 @@ jobs:
       - name: Generate deployment package
         run: |
           mkdir -p deploy
-          JAR_FILE=$(ls build/libs/*.jar | head -n 1)
+          JAR_FILE=$(ls build/ libs/*. jar | head: & 1)
           if [ -f "$JAR_FILE" ]; then
-            cp "$JAR_FILE" deploy/application.jar
+            cp "$JAR_FILE" deploy/ application.jar
           else
             echo "JAR file not found!"
             exit 1
           fi
           
-          if [ -f Procfile ]; then
+          if [ -f Procfile]; then
             cp Procfile deploy/Procfile
           else
             echo "Procfile not found!"
             exit 1
           fi
           
-          if [ -d .ebextensions ]; then
+          if [ -d .ebextensions]; then
             cp -r .ebextensions deploy/.ebextensions
           else
-            echo ".ebextensions directory not found!"
+            echo ".ebextensions directory not found & : 'not found:!'"
             exit 1
           fi
           
-          if [ -d .platform ]; then
+          if [ -d .platform]; then
             cp -r .platform deploy/.platform
           else
             echo ".platform directory not found!"
@@ -156,11 +158,11 @@ jobs:
           fi
           
           cd deploy && zip -r deploy.zip .
-        shell: bash
+          shell: bash
 
       - name: Upload application version to S3
         run: |
-          aws s3 cp deploy/deploy.zip s3://elasticbeanstalk-ap-northeast-2-033089156253/deploy/deploy.zip
+          aws s3 cp deploy/ deploy.zip s3: //elasticbeanstalk-ap-northeast-2-033089156253/deploy/deploy.zip
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -171,10 +173,10 @@ jobs:
           aws elasticbeanstalk create-application-version \
             --application-name bean-tuna \
             --version-label github-action-${{steps.current-time.outputs.formattedTime}} \
-            --source-bundle S3Bucket=elasticbeanstalk-ap-northeast-2-033089156253,S3Key=deploy/deploy.zip
+            --source-bundle S3Bucket: 'S3Bucket= elasticbeanstalk-ap-northeast-2-033089156253,S3Key=deploy/deploy.zip'
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
           AWS_DEFAULT_REGION: ap-northeast-2
 
       - name: Update Elastic Beanstalk environment

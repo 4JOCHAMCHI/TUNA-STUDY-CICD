@@ -10,9 +10,11 @@ import com.team4chamchi.tunastudycicd.reservation.repository.ReservationReposito
 import com.team4chamchi.tunastudycicd.studyroom.aggregate.Studyroom;
 import com.team4chamchi.tunastudycicd.studyroom.respository.StudyRoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,6 +40,20 @@ public class ReservationService {
         this.notificationService = notificationService;
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public static class MemberNotFoundException extends RuntimeException {
+        public MemberNotFoundException(String message) {
+            super(message);
+        }
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public static class InvalidRoomException extends RuntimeException {
+        public InvalidRoomException(String message) {
+            super(message);
+        }
+    }
+
     public List<ReservationDTO> findAllOccupiedSeat() {
         return reservationRepository.findByOccupiedTrue().stream().map(ReservationDTO::new).collect(Collectors.toList());
     }
@@ -58,9 +74,9 @@ public class ReservationService {
 
     @Transactional
     public ReservationDTO findReservationByPhoneAndSeat(String memberPhone, int roomId) {
-        Member member = findMemberByPhone(memberPhone).orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+        Member member = findMemberByPhone(memberPhone).orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
 
-        Studyroom room = studyRoomRepository.findById(roomId).orElseThrow(() -> new RuntimeException("유효하지 않은 좌석입니다."));
+        Studyroom room = studyRoomRepository.findById(roomId).orElseThrow(() -> new InvalidRoomException("유효하지 않은 좌석입니다."));
 
         Optional<Reservation> reservation = reservationRepository.findByMember_MemberPhoneAndRoom_RoomId(memberPhone, roomId);
 
@@ -82,8 +98,7 @@ public class ReservationService {
 
             foundReservation.setOccupied(true);
             foundReservation.setStartDate(LocalDateTime.now().withSecond(0).withNano(0));
-            foundReservation.setEndDate(foundReservation.getStartDate().
-                    plusHours(2).withSecond(0).withNano(0));
+            foundReservation.setEndDate(foundReservation.getStartDate().plusHours(2).withSecond(0).withNano(0));
 
             String phone = "+82" + foundReservation.getMember().getMemberPhone();
             String memberName = foundReservation.getMember().getMemberName();

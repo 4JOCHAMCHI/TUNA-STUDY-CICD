@@ -62,10 +62,8 @@ public class ReservationService {
 
         Studyroom room = studyRoomRepository.findById(roomId).orElseThrow(() -> new RuntimeException("유효하지 않은 좌석입니다."));
 
-        //전화번호랑 좌석으로 예약 조회
         Optional<Reservation> reservation = reservationRepository.findByMember_MemberPhoneAndRoom_RoomId(memberPhone, roomId);
 
-        //조회된 예약이 없는 경우 -> 예약
         if (reservation.isEmpty()) {
             Reservation newReservation = new Reservation(member, room);
 
@@ -84,10 +82,14 @@ public class ReservationService {
 
             foundReservation.setOccupied(true);
             foundReservation.setStartDate(LocalDateTime.now().withSecond(0).withNano(0));
-            foundReservation.setEndDate(foundReservation.getStartDate().plusHours(2).withSecond(0).withNano(0));
+            foundReservation.setEndDate(foundReservation.getStartDate().
+                    plusHours(2).withSecond(0).withNano(0));
 
             String phone = "+82" + foundReservation.getMember().getMemberPhone();
+            String memberName = foundReservation.getMember().getMemberName();
             String roomName = foundReservation.getRoom().getRoomName();
+
+            notificationService.sendMessage(phone, memberName + "님, " + roomName + "번 좌석 예약되었습니다!");
 
             return new ReservationDTO(reservationRepository.save(foundReservation));
         } else {
@@ -95,7 +97,6 @@ public class ReservationService {
         }
     }
 
-    //퇴실
     @Transactional
     public ReservationDTO releaseReservation(int reservationId) {
         Optional<Reservation> reservation = reservationRepository.findById(reservationId);
@@ -107,9 +108,10 @@ public class ReservationService {
             foundReservation.setEndDate(LocalDateTime.now().withSecond(0).withNano(0));
 
             String phone = "+82" + foundReservation.getMember().getMemberPhone();
+            String memberName = foundReservation.getMember().getMemberName();
             String roomName = foundReservation.getRoom().getRoomName();
 
-//            notificationService.sendMessage(phone, roomName + "번 좌석 퇴실되었습니다!");
+            notificationService.sendMessage(phone, memberName + "님, " + roomName + "번 좌석 퇴실되었습니다!");
 
             return new ReservationDTO(reservationRepository.save(foundReservation));
         } else {
@@ -122,11 +124,20 @@ public class ReservationService {
         LocalDateTime tenMinutesAgo = LocalDateTime.now().plusMinutes(10).withSecond(0).withNano(0);
         List<Reservation> reservationList = reservationRepository.findByOccupiedTrueAndEndDate(tenMinutesAgo);
 
-        System.out.println("실행");
-
         for (Reservation reservation : reservationList) {
             notificationService.sendMessage("+82" + reservation.getMember().getMemberPhone(),
-                    reservation.getRoom().getRoomName()+ "번 좌석 퇴실 10분 전입니다.");
+                    reservation.getMember().getMemberName() + "님, " +
+                            reservation.getRoom().getRoomName()+ "번 좌석 퇴실 10분 전입니다.");
+        }
+    }
+
+    @Scheduled(cron = "0 * * * * *")
+    public void autoReleaseReservation() {
+        LocalDateTime now = LocalDateTime.now().withSecond(0).withNano(0);
+        List<Reservation> reservationList = reservationRepository.findByOccupiedTrueAndEndDate(now);
+
+        for (Reservation reservation : reservationList) {
+            releaseReservation(reservation.getReservationId());
         }
     }
 }

@@ -55,7 +55,8 @@ public class ReservationService {
     }
 
     public List<ReservationDTO> findAllOccupiedSeat() {
-        return reservationRepository.findByOccupiedTrue().stream().map(ReservationDTO::new).collect(Collectors.toList());
+        return reservationRepository.findByOccupiedTrue().stream().map(ReservationDTO::new)
+                .collect(Collectors.toList());
     }
 
     public Optional<Reservation> findReservationByPhone(String memberPhone) {
@@ -74,11 +75,14 @@ public class ReservationService {
 
     @Transactional
     public ReservationDTO findReservationByPhoneAndSeat(String memberPhone, int roomId) {
-        Member member = findMemberByPhone(memberPhone).orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
+        Member member = findMemberByPhone(memberPhone).orElseThrow(()
+                -> new MemberNotFoundException("존재하지 않는 회원입니다."));
 
-        Studyroom room = studyRoomRepository.findById(roomId).orElseThrow(() -> new InvalidRoomException("유효하지 않은 좌석입니다."));
+        Studyroom room = studyRoomRepository.findById(roomId).orElseThrow(()
+                -> new InvalidRoomException("유효하지 않은 좌석입니다."));
 
-        Optional<Reservation> reservation = reservationRepository.findByMember_MemberPhoneAndRoom_RoomId(memberPhone, roomId);
+        Optional<Reservation> reservation =
+                reservationRepository.findByMember_MemberPhoneAndRoom_RoomId(memberPhone, roomId);
 
         if (reservation.isEmpty()) {
             Reservation newReservation = new Reservation(member, room);
@@ -98,7 +102,8 @@ public class ReservationService {
 
             foundReservation.setOccupied(true);
             foundReservation.setStartDate(LocalDateTime.now().withSecond(0).withNano(0));
-            foundReservation.setEndDate(foundReservation.getStartDate().plusHours(2).withSecond(0).withNano(0));
+            foundReservation.setEndDate
+                    (foundReservation.getStartDate().plusHours(2).withSecond(0).withNano(0));
 
             String phone = "+82" + foundReservation.getMember().getMemberPhone();
             String memberName = foundReservation.getMember().getMemberName();

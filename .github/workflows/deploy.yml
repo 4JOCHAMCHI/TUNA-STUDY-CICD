@@ -1,4 +1,4 @@
-name: tuna-study-backend
+name: tuna-study
 
 permissions:
   contents: read
@@ -130,13 +130,13 @@ jobs:
             echo "JAR file not found!"
             exit 1
           fi
-          
-          if [ -f Procfile ]; then
+
+#          if [ -f Procfile ]; then
             cp Procfile deploy/Procfile
-          else
-            echo "Procfile not found!"
-            exit 1
-          fi
+#          else
+#            echo "Procfile not found!"
+#            exit 1
+#          fi
           
           if [ -d .ebextensions ]; then
             cp -r .ebextensions deploy/.ebextensions

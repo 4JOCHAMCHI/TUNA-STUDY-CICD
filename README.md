@@ -1,3 +1,11 @@
 # TUNA-STUDY-CICD
 
-github action 과 aws를 이용한 ci/cd test repository
+1. 프로젝트 개요 및 기횟
+
+2. 시스템 아키텍처
+
+3. 팀원별 맡은 업무 및 일정
+
+4. 팀원별 협업 내역 첨부
+
+5. 서비스 시연 영상
